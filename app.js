@@ -240,18 +240,6 @@ function bindEvents() {
   });
 
   els.dealButton.addEventListener("click", startRound);
-<<<<<<< HEAD
-  els.orientationContinueButton.addEventListener("click", () => {
-    if (canForceDismissOrientationGuard()) {
-      document.body.classList.remove("orientation-required");
-      els.orientationGuard.hidden = true;
-      attemptBackgroundPlayback(true);
-      return;
-    }
-    toast("请先将设备旋转到横屏后再继续。", "error");
-  });
-=======
->>>>>>> 303025d2d6229041a5c01861c2b674574d17ad68
   els.openDetailsButton.addEventListener("click", () => {
     syncSettingsInputs();
     els.detailsDialog.showModal();
