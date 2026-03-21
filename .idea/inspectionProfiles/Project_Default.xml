@@ -1,0 +1,62 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="tiktoken" />
+          <option value="langdetect" />
+          <option value="redis" />
+          <option value="tencentcloud-sdk-python" />
+          <option value="alibabacloud-imageprocess20200320" />
+          <option value="markdown2" />
+          <option value="tabulate" />
+          <option value="tools" />
+          <option value="xlrd" />
+          <option value="pandas" />
+          <option value="qiniu" />
+          <option value="textract" />
+          <option value="dirtyjson" />
+          <option value="blind-watermark" />
+          <option value="marshmallow" />
+          <option value="beautifulsoup4" />
+          <option value="openpyxl" />
+          <option value="simplejson" />
+          <option value="zhipuai" />
+          <option value="volcengine" />
+          <option value="gevent" />
+          <option value="python-redis-lock" />
+          <option value="wechatpy" />
+          <option value="elasticsearch" />
+          <option value="bcrypt" />
+          <option value="argparse" />
+          <option value="pathlib" />
+          <option value="numpy" />
+          <option value="exception" />
+          <option value="fitz" />
+          <option value="cos-python-sdk-v5" />
+          <option value="openpyxl-image-loader" />
+          <option value="httplib2" />
+          <option value="tenacity" />
+          <option value="pypinyin" />
+          <option value="json-repair" />
+          <option value="gmssl" />
+          <option value="pydub" />
+          <option value="python-magic" />
+          <option value="selenium" />
+          <option value="casbin" />
+          <option value="casbin-sqlalchemy-adapter" />
+          <option value="imgkit" />
+          <option value="Flask-Mail" />
+          <option value="WeasyPrint" />
+          <option value="alibabacloud_bailian20231229" />
+          <option value="pyDes" />
+          <option value="alibabacloud_tea_openapi" />
+          <option value="alibabacloud_tea_util" />
+          <option value="yunzhanghu_sdk" />
+          <option value="webdriver_manager" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

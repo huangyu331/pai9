@@ -26,7 +26,10 @@
               <p class="panel-label">当前筹码</p>
               <div class="chips-value" id="chipsValue">10,000</div>
             </div>
-            <button class="ghost-button details-button" id="openDetailsButton">详情</button>
+            <div class="topbar-actions">
+              <button class="ghost-button music-button" id="bgmToggleButton" type="button" aria-pressed="true">音乐开</button>
+              <button class="ghost-button details-button" id="openDetailsButton" type="button">详情</button>
+            </div>
           </div>
 
           <div class="table-surface">
@@ -147,6 +150,10 @@
                 <input type="checkbox" id="specialCombosToggle" />
               </label>
               <label class="toggle-row">
+                <span>背景音乐</span>
+                <input type="checkbox" id="musicToggle" />
+              </label>
+              <label class="toggle-row">
                 <span>庄家优势</span>
                 <input type="checkbox" id="bankerAdvantageToggle" />
               </label>
@@ -192,6 +199,7 @@
     </dialog>
 
     <div class="toast-stack" id="toastStack"></div>
+    <audio id="bgmAudio" src="./hq.mp3" loop preload="auto" autoplay playsinline webkit-playsinline></audio>
 
     <script src="./app.js"></script>
   </body>

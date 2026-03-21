@@ -187,15 +187,27 @@ button {
   margin-bottom: 16px;
 }
 
+.topbar-actions {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(-50%);
+}
+
 .table-bankroll {
   text-align: center;
 }
 
 .details-button {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  position: static;
+  transform: none;
+}
+
+.music-button.is-off {
+  opacity: 0.72;
 }
 
 .brand-lockup {
@@ -918,8 +930,13 @@ button {
     grid-template-columns: 1fr;
   }
 
-  .details-button {
+  .topbar-actions {
     position: static;
+    right: auto;
+    top: auto;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
     transform: none;
   }
 

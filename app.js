@@ -1,4 +1,14 @@
 const STORAGE_KEY = "paijiu-master-save-v1";
+const DEFAULT_PREFERENCES = {
+  theme: "dark",
+  musicEnabled: true,
+};
+
+const DEFAULT_PROFILE_SETTINGS = {
+  specialCombos: true,
+  bankerAdvantage: true,
+};
+
 const PIP_POSITIONS = {
   1: [{ x: 50, y: 50 }],
   2: [
@@ -137,6 +147,9 @@ const state = {
     dice: null,
     round: null,
   },
+  audio: {
+    blocked: false,
+  },
 };
 
 const DIE_FACE_ORDER = [1, 6, 2, 5, 3, 4];
@@ -147,6 +160,9 @@ boot();
 
 function boot() {
   ensureProfiles();
+  normalizeDatabase();
+  resetMusicPreferenceForEntry();
+  initBackgroundAudio();
   bindEvents();
   renderRules();
   renderComboPreview();
@@ -182,6 +198,7 @@ function mapElements() {
     playerAvatar: document.getElementById("playerAvatar"),
     avatarFallback: document.getElementById("avatarFallback"),
     specialCombosToggle: document.getElementById("specialCombosToggle"),
+    musicToggle: document.getElementById("musicToggle"),
     bankerAdvantageToggle: document.getElementById("bankerAdvantageToggle"),
     lightThemeToggle: document.getElementById("lightThemeToggle"),
     detailsDialog: document.getElementById("detailsDialog"),
@@ -190,6 +207,8 @@ function mapElements() {
     orientationGuard: document.getElementById("orientationGuard"),
     orientationContinueButton: document.getElementById("orientationContinueButton"),
     openDetailsButton: document.getElementById("openDetailsButton"),
+    bgmToggleButton: document.getElementById("bgmToggleButton"),
+    bgmAudio: document.getElementById("bgmAudio"),
     createProfileButton: document.getElementById("createProfileButton"),
     exportDataButton: document.getElementById("exportDataButton"),
     halfButton: document.getElementById("halfButton"),
@@ -228,6 +247,7 @@ function bindEvents() {
     if (canForceDismissOrientationGuard()) {
       document.body.classList.remove("orientation-required");
       els.orientationGuard.hidden = true;
+      attemptBackgroundPlayback(true);
       return;
     }
     toast("请先将设备旋转到横屏后再继续。", "error");
@@ -246,6 +266,9 @@ function bindEvents() {
     persist();
     refreshAll();
   });
+  els.musicToggle.addEventListener("change", () => {
+    setMusicEnabled(els.musicToggle.checked, true);
+  });
   els.bankerAdvantageToggle.addEventListener("change", () => {
     getActiveProfile().settings.bankerAdvantage = els.bankerAdvantageToggle.checked;
     persist();
@@ -255,6 +278,13 @@ function bindEvents() {
     state.db.preferences.theme = els.lightThemeToggle.checked ? "light" : "dark";
     persist();
     applyTheme();
+  });
+  els.bgmToggleButton.addEventListener("click", () => {
+    if (state.audio.blocked && state.db.preferences.musicEnabled) {
+      attemptBackgroundPlayback(true);
+      return;
+    }
+    setMusicEnabled(!state.db.preferences.musicEnabled, true);
   });
 }
 
@@ -289,10 +319,7 @@ function createProfile(name, avatar = "") {
       currentStreak: 0,
       profit: 0,
     },
-    settings: {
-      specialCombos: true,
-      bankerAdvantage: true,
-    },
+    settings: { ...DEFAULT_PROFILE_SETTINGS },
     history: [],
   };
 }
@@ -301,18 +328,32 @@ function loadDatabase() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return { activeProfileId: "", profiles: [], preferences: { theme: "dark" } };
+      return { activeProfileId: "", profiles: [], preferences: { ...DEFAULT_PREFERENCES } };
     }
     const parsed = JSON.parse(raw);
     return {
       activeProfileId: parsed.activeProfileId || "",
       profiles: Array.isArray(parsed.profiles) ? parsed.profiles : [],
-      preferences: parsed.preferences || { theme: "dark" },
+      preferences: { ...DEFAULT_PREFERENCES, ...(parsed.preferences || {}) },
     };
   } catch (error) {
     console.error(error);
-    return { activeProfileId: "", profiles: [], preferences: { theme: "dark" } };
+    return { activeProfileId: "", profiles: [], preferences: { ...DEFAULT_PREFERENCES } };
   }
+}
+
+function normalizeDatabase() {
+  state.db.preferences = { ...DEFAULT_PREFERENCES, ...(state.db.preferences || {}) };
+  state.db.profiles = state.db.profiles.map((profile) => ({
+    ...profile,
+    settings: { ...DEFAULT_PROFILE_SETTINGS, ...(profile.settings || {}) },
+  }));
+  persist();
+}
+
+function resetMusicPreferenceForEntry() {
+  state.db.preferences.musicEnabled = true;
+  persist();
 }
 
 function persist() {
@@ -331,6 +372,7 @@ function refreshAll() {
   renderStats();
   renderProfiles();
   syncSettingsInputs();
+  refreshMusicControls();
 }
 
 function refreshHeader() {
@@ -590,6 +632,7 @@ function renderProfiles() {
 function syncSettingsInputs() {
   const profile = getActiveProfile();
   els.specialCombosToggle.checked = profile.settings.specialCombos;
+  els.musicToggle.checked = state.db.preferences.musicEnabled;
   els.bankerAdvantageToggle.checked = profile.settings.bankerAdvantage;
   els.lightThemeToggle.checked = state.db.preferences.theme === "light";
 }
@@ -656,10 +699,14 @@ function importData(event) {
       state.db = {
         activeProfileId: data.activeProfileId || data.profiles[0].id,
         profiles: data.profiles,
-        preferences: data.preferences || { theme: "dark" },
+        preferences: { ...DEFAULT_PREFERENCES, ...(data.preferences || {}) },
       };
       ensureProfiles();
+      normalizeDatabase();
+      resetMusicPreferenceForEntry();
       persist();
+      applyTheme();
+      setMusicEnabled(true, false);
       refreshAll();
       toast("存档导入成功。", "success");
     } catch (error) {
@@ -964,6 +1011,88 @@ function areAllCardsRevealed(round) {
 
 function applyTheme() {
   document.body.dataset.theme = state.db.preferences.theme === "light" ? "light" : "dark";
+}
+
+function initBackgroundAudio() {
+  const audio = els.bgmAudio;
+  audio.autoplay = true;
+  audio.volume = 0.42;
+  audio.load();
+
+  const unlockPlayback = () => {
+    if (state.db.preferences.musicEnabled) {
+      attemptBackgroundPlayback(true);
+    }
+  };
+
+  document.addEventListener("pointerdown", unlockPlayback, { passive: true, once: true });
+  document.addEventListener("touchstart", unlockPlayback, { passive: true, once: true });
+  document.addEventListener("keydown", unlockPlayback, { once: true });
+  window.addEventListener("load", () => attemptBackgroundPlayback(false), { once: true });
+  window.addEventListener("pageshow", () => attemptBackgroundPlayback(false));
+  window.addEventListener("focus", () => attemptBackgroundPlayback(false));
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) {
+      attemptBackgroundPlayback(false);
+    }
+  });
+  attemptBackgroundPlayback(false);
+}
+
+function setMusicEnabled(enabled, fromUserAction = false) {
+  state.db.preferences.musicEnabled = enabled;
+  persist();
+  refreshMusicControls();
+
+  if (!enabled) {
+    stopBackgroundPlayback();
+    return;
+  }
+
+  attemptBackgroundPlayback(fromUserAction);
+}
+
+function refreshMusicControls() {
+  const enabled = state.db.preferences.musicEnabled;
+  els.musicToggle.checked = enabled;
+  els.bgmToggleButton.textContent = enabled ? "音乐开" : "音乐关";
+  els.bgmToggleButton.setAttribute("aria-pressed", String(enabled));
+  els.bgmToggleButton.classList.toggle("is-off", !enabled);
+  if (state.audio.blocked && enabled) {
+    els.bgmToggleButton.textContent = "点按开音乐";
+  }
+}
+
+function attemptBackgroundPlayback(fromUserAction) {
+  if (!state.db.preferences.musicEnabled) {
+    return;
+  }
+
+  const playPromise = els.bgmAudio.play();
+  if (!playPromise || typeof playPromise.then !== "function") {
+    state.audio.blocked = false;
+    refreshMusicControls();
+    return;
+  }
+
+  playPromise
+    .then(() => {
+      state.audio.blocked = false;
+      refreshMusicControls();
+    })
+    .catch(() => {
+      state.audio.blocked = true;
+      refreshMusicControls();
+      if (fromUserAction) {
+        toast("浏览器阻止了播放，请再点一次音乐按钮。", "error");
+      }
+    });
+}
+
+function stopBackgroundPlayback() {
+  els.bgmAudio.pause();
+  state.audio.blocked = false;
+  refreshMusicControls();
 }
 
 function registerServiceWorker() {
