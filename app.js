@@ -167,7 +167,6 @@ function boot() {
   renderRules();
   renderComboPreview();
   applyTheme();
-  setupOrientationGuard();
   awardDailyBonus();
   refreshAll();
   registerServiceWorker();
@@ -204,8 +203,6 @@ function mapElements() {
     detailsDialog: document.getElementById("detailsDialog"),
     rulesContent: document.getElementById("rulesContent"),
     toastStack: document.getElementById("toastStack"),
-    orientationGuard: document.getElementById("orientationGuard"),
-    orientationContinueButton: document.getElementById("orientationContinueButton"),
     openDetailsButton: document.getElementById("openDetailsButton"),
     bgmToggleButton: document.getElementById("bgmToggleButton"),
     bgmAudio: document.getElementById("bgmAudio"),
@@ -243,6 +240,7 @@ function bindEvents() {
   });
 
   els.dealButton.addEventListener("click", startRound);
+<<<<<<< HEAD
   els.orientationContinueButton.addEventListener("click", () => {
     if (canForceDismissOrientationGuard()) {
       document.body.classList.remove("orientation-required");
@@ -252,6 +250,8 @@ function bindEvents() {
     }
     toast("请先将设备旋转到横屏后再继续。", "error");
   });
+=======
+>>>>>>> 303025d2d6229041a5c01861c2b674574d17ad68
   els.openDetailsButton.addEventListener("click", () => {
     syncSettingsInputs();
     els.detailsDialog.showModal();
@@ -1099,54 +1099,6 @@ function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch((error) => console.error(error));
   }
-}
-
-function setupOrientationGuard() {
-  syncOrientationGuard();
-  window.addEventListener("resize", syncOrientationGuard);
-  window.addEventListener("orientationchange", () => {
-    syncOrientationGuard();
-    window.setTimeout(syncOrientationGuard, 120);
-    window.setTimeout(syncOrientationGuard, 320);
-  });
-  window.visualViewport?.addEventListener("resize", syncOrientationGuard);
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      syncOrientationGuard();
-    }
-  });
-
-  if (screen.orientation?.lock) {
-    const requestLock = () => {
-      screen.orientation.lock("landscape").catch(() => {});
-    };
-    requestLock();
-    document.addEventListener("click", requestLock, { passive: true });
-  }
-}
-
-function syncOrientationGuard() {
-  const needsLandscape = isPortraitPhone();
-  document.body.classList.toggle("orientation-required", needsLandscape);
-  els.orientationGuard.hidden = !needsLandscape;
-}
-
-function isPortraitPhone() {
-  const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-  const narrowScreen = window.matchMedia("(max-width: 960px)").matches;
-  const byViewport = window.innerHeight > window.innerWidth;
-  const byScreenOrientation = screen.orientation?.type?.startsWith("portrait") ?? false;
-  const hasWindowOrientation = typeof window.orientation === "number";
-  const byAngle = hasWindowOrientation ? Math.abs(window.orientation) !== 90 : false;
-  const portrait = byViewport || byScreenOrientation || byAngle;
-  return coarsePointer && narrowScreen && portrait;
-}
-
-function canForceDismissOrientationGuard() {
-  const landscapeByViewport = window.innerWidth > window.innerHeight;
-  const landscapeByOrientation = screen.orientation?.type?.startsWith("landscape") ?? false;
-  const landscapeByAngle = typeof window.orientation === "number" ? Math.abs(window.orientation) === 90 : false;
-  return landscapeByViewport || landscapeByOrientation || landscapeByAngle;
 }
 
 function toast(message, type = "success") {
