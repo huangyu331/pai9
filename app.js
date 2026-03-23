@@ -244,6 +244,7 @@ function bindEvents() {
 
   els.dealButton.addEventListener("click", startRound);
   els.orientationContinueButton.addEventListener("click", () => {
+    syncOrientationGuard();
     if (canForceDismissOrientationGuard()) {
       document.body.classList.remove("orientation-required");
       els.orientationGuard.hidden = true;
@@ -1133,19 +1134,26 @@ function syncOrientationGuard() {
 function isPortraitPhone() {
   const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
   const narrowScreen = window.matchMedia("(max-width: 960px)").matches;
-  const byViewport = window.innerHeight > window.innerWidth;
-  const byScreenOrientation = screen.orientation?.type?.startsWith("portrait") ?? false;
-  const hasWindowOrientation = typeof window.orientation === "number";
-  const byAngle = hasWindowOrientation ? Math.abs(window.orientation) !== 90 : false;
-  const portrait = byViewport || byScreenOrientation || byAngle;
+  const portrait = isPortraitViewport();
   return coarsePointer && narrowScreen && portrait;
 }
 
 function canForceDismissOrientationGuard() {
-  const landscapeByViewport = window.innerWidth > window.innerHeight;
-  const landscapeByOrientation = screen.orientation?.type?.startsWith("landscape") ?? false;
-  const landscapeByAngle = typeof window.orientation === "number" ? Math.abs(window.orientation) === 90 : false;
-  return landscapeByViewport || landscapeByOrientation || landscapeByAngle;
+  return isLandscapeViewport();
+}
+
+function isPortraitViewport() {
+  const mediaPortrait = window.matchMedia("(orientation: portrait)").matches;
+  const viewportWidth = window.visualViewport?.width || window.innerWidth;
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  return mediaPortrait || viewportHeight - viewportWidth > 24;
+}
+
+function isLandscapeViewport() {
+  const mediaLandscape = window.matchMedia("(orientation: landscape)").matches;
+  const viewportWidth = window.visualViewport?.width || window.innerWidth;
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  return mediaLandscape || viewportWidth - viewportHeight > 24;
 }
 
 function registerServiceWorker() {
