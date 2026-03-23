@@ -165,7 +165,6 @@ function boot() {
   renderRules();
   renderComboPreview();
   applyTheme();
-  setupOrientationGuard();
   awardDailyBonus();
   refreshAll();
   registerServiceWorker();
@@ -190,8 +189,6 @@ function mapElements() {
     statsGrid: document.getElementById("statsGrid"),
     comboPreview: document.getElementById("comboPreview"),
     profileList: document.getElementById("profileList"),
-    orientationGuard: document.getElementById("orientationGuard"),
-    orientationContinueButton: document.getElementById("orientationContinueButton"),
     tablePlayerName: document.getElementById("tablePlayerName"),
     tablePlayerAvatar: document.getElementById("tablePlayerAvatar"),
     profileNameInput: document.getElementById("profileNameInput"),
@@ -243,16 +240,6 @@ function bindEvents() {
   });
 
   els.dealButton.addEventListener("click", startRound);
-  els.orientationContinueButton.addEventListener("click", () => {
-    syncOrientationGuard();
-    if (canForceDismissOrientationGuard()) {
-      document.body.classList.remove("orientation-required");
-      els.orientationGuard.hidden = true;
-      attemptBackgroundPlayback(true);
-      return;
-    }
-    toast("请先将设备旋转到横屏后再继续。", "error");
-  });
   els.openDetailsButton.addEventListener("click", () => {
     syncSettingsInputs();
     els.detailsDialog.showModal();
@@ -1099,61 +1086,6 @@ function stopBackgroundPlayback() {
   els.bgmAudio.pause();
   state.audio.blocked = false;
   refreshMusicControls();
-}
-
-function setupOrientationGuard() {
-  syncOrientationGuard();
-  window.addEventListener("resize", syncOrientationGuard);
-  window.addEventListener("orientationchange", () => {
-    syncOrientationGuard();
-    window.setTimeout(syncOrientationGuard, 120);
-    window.setTimeout(syncOrientationGuard, 320);
-  });
-  window.visualViewport?.addEventListener("resize", syncOrientationGuard);
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      syncOrientationGuard();
-    }
-  });
-
-  if (screen.orientation?.lock) {
-    const requestLock = () => {
-      screen.orientation.lock("landscape").catch(() => {});
-    };
-    requestLock();
-    document.addEventListener("click", requestLock, { passive: true });
-  }
-}
-
-function syncOrientationGuard() {
-  const needsLandscape = isPortraitPhone();
-  document.body.classList.toggle("orientation-required", needsLandscape);
-  els.orientationGuard.hidden = !needsLandscape;
-}
-
-function isPortraitPhone() {
-  const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
-  const narrowScreen = window.matchMedia("(max-width: 960px)").matches;
-  const portrait = isPortraitViewport();
-  return coarsePointer && narrowScreen && portrait;
-}
-
-function canForceDismissOrientationGuard() {
-  return isLandscapeViewport();
-}
-
-function isPortraitViewport() {
-  const mediaPortrait = window.matchMedia("(orientation: portrait)").matches;
-  const viewportWidth = window.visualViewport?.width || window.innerWidth;
-  const viewportHeight = window.visualViewport?.height || window.innerHeight;
-  return mediaPortrait || viewportHeight - viewportWidth > 24;
-}
-
-function isLandscapeViewport() {
-  const mediaLandscape = window.matchMedia("(orientation: landscape)").matches;
-  const viewportWidth = window.visualViewport?.width || window.innerWidth;
-  const viewportHeight = window.visualViewport?.height || window.innerHeight;
-  return mediaLandscape || viewportWidth - viewportHeight > 24;
 }
 
 function registerServiceWorker() {
