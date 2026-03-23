@@ -98,12 +98,10 @@ const PAIR_RANKS = new Map([
 ]);
 
 const SPECIAL_HANDS = [
-  { key: "tianwang", label: "天王", matcher: (a, b) => includes(a, b, "tian") && [9].includes(otherTile(a, b, "tian").points), points: 1, tiebreak: 6 },
-  { key: "diwang", label: "地王", matcher: (a, b) => includes(a, b, "di") && [9].includes(otherTile(a, b, "di").points), points: 1, tiebreak: 5 },
-  { key: "tiangang", label: "天杠", matcher: (a, b) => includes(a, b, "tian") && [8].includes(otherTile(a, b, "tian").points), points: 0, tiebreak: 4 },
-  { key: "digang", label: "地杠", matcher: (a, b) => includes(a, b, "di") && [8].includes(otherTile(a, b, "di").points), points: 0, tiebreak: 3 },
-  { key: "tiangaojiu", label: "天高九", matcher: (a, b) => includes(a, b, "tian") && includes(a, b, "heiqi"), points: 9, tiebreak: 2 },
-  { key: "digaojiu", label: "地高九", matcher: (a, b) => includes(a, b, "di") && includes(a, b, "gaojiaoqi"), points: 9, tiebreak: 1 },
+  { key: "tianwang", label: "天王", matcher: (a, b) => includes(a, b, "tian") && [9].includes(otherTile(a, b, "tian").points), rank: 4, points: 1 },
+  { key: "diwang", label: "地王", matcher: (a, b) => includes(a, b, "di") && [9].includes(otherTile(a, b, "di").points), rank: 3, points: 1 },
+  { key: "tiangang", label: "天杠", matcher: (a, b) => includes(a, b, "tian") && [8].includes(otherTile(a, b, "tian").points), rank: 2, points: 0 },
+  { key: "digang", label: "地杠", matcher: (a, b) => includes(a, b, "di") && [8].includes(otherTile(a, b, "di").points), rank: 1, points: 0 },
 ];
 
 const MODE_META = {
@@ -115,7 +113,7 @@ const RULES_SECTIONS = [
     title: "核心规则",
     lines: [
       "每局你和庄家各得 2 张牌，直接比大小。",
-      "对牌永远大于非对牌，至尊宝是最大对牌。",
+      "牌型优先级为：至尊宝 > 其他对牌 > 天王 > 地王 > 天杠 > 地杠 > 普通牌。",
       "非对牌比较点数个位数，同点数再比最大单张。",
       "完全相同默认庄家赢，可在设置中关闭庄家优势。",
     ],
@@ -123,8 +121,8 @@ const RULES_SECTIONS = [
   {
     title: "特殊组合",
     lines: [
-      "支持天王、地王、天杠、地杠、天高九、地高九。",
-      "这些组合按文档作为命名牌处理，并在同点数时优先于普通点数牌。",
+      "当前特殊组合只参与高阶比较的有：天王、地王、天杠、地杠。",
+      "未列入优先级的组合按普通点数牌处理。",
     ],
   },
   {
@@ -191,6 +189,9 @@ function mapElements() {
     statsGrid: document.getElementById("statsGrid"),
     comboPreview: document.getElementById("comboPreview"),
     profileList: document.getElementById("profileList"),
+    tablePlayerName: document.getElementById("tablePlayerName"),
+    tablePlayerAvatar: document.getElementById("tablePlayerAvatar"),
+    tableAvatarFallback: document.getElementById("tableAvatarFallback"),
     profileNameInput: document.getElementById("profileNameInput"),
     avatarInput: document.getElementById("avatarInput"),
     importDataInput: document.getElementById("importDataInput"),
@@ -366,12 +367,16 @@ function refreshAll() {
 function refreshHeader() {
   const profile = getActiveProfile();
   els.playerName.textContent = profile.nickname;
+  els.tablePlayerName.textContent = profile.nickname;
   els.playerMeta.textContent = `总局数 ${formatNumber(profile.stats.rounds)} · 总盈利 ${formatSigned(profile.stats.profit)}`;
   els.chipsValue.textContent = formatNumber(profile.chips);
   els.playerAvatar.hidden = !profile.avatar;
+  els.tablePlayerAvatar.hidden = !profile.avatar;
   els.avatarFallback.hidden = Boolean(profile.avatar);
+  els.tableAvatarFallback.hidden = Boolean(profile.avatar);
   if (profile.avatar) {
     els.playerAvatar.src = profile.avatar;
+    els.tablePlayerAvatar.src = profile.avatar;
   }
 }
 
@@ -876,11 +881,12 @@ function evaluateHand(tiles, settings) {
   const [left, right] = [...tiles].sort((a, b) => b.singleRank - a.singleRank);
   const pair = detectPair(left, right);
   if (pair) {
+    const isZhizunbao = pair.label === "至尊宝";
     return {
-      category: "pair",
+      category: isZhizunbao ? "supreme-pair" : "pair",
       title: pair.label,
       description: `${left.name} + ${right.name}`,
-      strength: [2, pair.rank, left.singleRank, right.singleRank],
+      strength: [isZhizunbao ? 3 : 2, pair.rank, left.singleRank, right.singleRank],
     };
   }
 
@@ -892,7 +898,7 @@ function evaluateHand(tiles, settings) {
         title: special.label,
         description: `${left.name} + ${right.name}，${special.points}点`,
         points: special.points,
-        strength: [1, special.points, special.tiebreak, left.singleRank, right.singleRank],
+        strength: [1, special.rank, special.points, left.singleRank, right.singleRank],
       };
     }
   }
@@ -1085,7 +1091,34 @@ function stopBackgroundPlayback() {
 
 function registerServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch((error) => console.error(error));
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let refreshing = false;
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!hadController || refreshing) {
+        return;
+      }
+      refreshing = true;
+      window.location.reload();
+    });
+
+    navigator.serviceWorker
+      .register("./sw.js", { updateViaCache: "none" })
+      .then((registration) => {
+        registration.update().catch(() => {});
+
+        const checkForUpdates = () => {
+          registration.update().catch(() => {});
+        };
+
+        window.addEventListener("focus", checkForUpdates);
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden) {
+            checkForUpdates();
+          }
+        });
+      })
+      .catch((error) => console.error(error));
   }
 }
 

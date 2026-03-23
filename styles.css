@@ -139,6 +139,32 @@ button {
   margin-bottom: 16px;
 }
 
+.table-player-badge {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 240px;
+  transform: translateY(-50%);
+}
+
+.table-player-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.table-player-copy strong {
+  display: block;
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--gold-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .topbar-actions {
   position: absolute;
   right: 0;
@@ -195,6 +221,16 @@ button {
   width: 100%;
   height: 100%;
   border-radius: 22px;
+}
+
+.avatar-wrap-sm {
+  width: 56px;
+  height: 56px;
+}
+
+.avatar-wrap-sm img,
+.avatar-wrap-sm .avatar-fallback {
+  border-radius: 18px;
 }
 
 .avatar-fallback {
@@ -882,6 +918,7 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .table-player-badge,
   .topbar-actions {
     position: static;
     right: auto;
@@ -890,6 +927,15 @@ button {
     justify-content: center;
     flex-wrap: wrap;
     transform: none;
+  }
+
+  .table-player-badge {
+    max-width: none;
+  }
+
+  .table-player-copy {
+    justify-items: center;
+    text-align: center;
   }
 
   .details-grid {

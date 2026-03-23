@@ -13,6 +13,16 @@
       <main class="table-page">
         <section class="game-panel main-table-panel">
           <div class="table-topbar">
+            <div class="table-player-badge">
+              <div class="table-player-avatar avatar-wrap avatar-wrap-sm">
+                <img id="tablePlayerAvatar" alt="主页面玩家头像" hidden />
+                <div class="avatar-fallback" id="tableAvatarFallback">牌</div>
+              </div>
+              <div class="table-player-copy">
+                <p class="panel-label">当前玩家</p>
+                <strong id="tablePlayerName">访客玩家</strong>
+              </div>
+            </div>
             <div class="table-bankroll">
               <p class="panel-label">当前筹码</p>
               <div class="chips-value" id="chipsValue">10,000</div>
