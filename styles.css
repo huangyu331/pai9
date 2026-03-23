@@ -57,6 +57,54 @@ body::before {
   mask-image: radial-gradient(circle at center, black, transparent 85%);
 }
 
+.orientation-guard {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top, rgba(255, 217, 135, 0.18), transparent 30%),
+    linear-gradient(145deg, rgba(34, 10, 12, 0.96), rgba(16, 39, 29, 0.96));
+}
+
+.orientation-card {
+  width: min(440px, 100%);
+  padding: 28px 24px;
+  border-radius: 28px;
+  border: 1px solid var(--line);
+  background: rgba(74, 20, 22, 0.88);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.orientation-card h2,
+.orientation-card p {
+  margin: 0;
+}
+
+.orientation-card h2 {
+  margin: 10px 0 12px;
+}
+
+.orientation-continue {
+  margin-top: 18px;
+}
+
+body.orientation-required {
+  overflow: hidden;
+}
+
+body.orientation-required .app-shell,
+body.orientation-required .toast-stack {
+  visibility: hidden;
+}
+
+body.orientation-required .orientation-guard {
+  display: grid;
+}
+
 button,
 input {
   font: inherit;
@@ -132,22 +180,25 @@ button {
 }
 
 .table-topbar {
-  position: relative;
   display: grid;
-  justify-items: center;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
+.table-player-badge,
+.table-bankroll,
+.topbar-actions {
+  min-width: 0;
+}
+
 .table-player-badge {
-  position: absolute;
-  left: 0;
-  top: 50%;
   display: flex;
   align-items: center;
   gap: 12px;
-  max-width: 240px;
-  transform: translateY(-50%);
+  justify-self: start;
+  max-width: 100%;
 }
 
 .table-player-copy {
@@ -166,17 +217,15 @@ button {
 }
 
 .topbar-actions {
-  position: absolute;
-  right: 0;
-  top: 50%;
   display: flex;
   align-items: center;
+  justify-self: end;
   gap: 10px;
-  transform: translateY(-50%);
 }
 
 .table-bankroll {
   text-align: center;
+  justify-self: center;
 }
 
 .details-button {
@@ -226,6 +275,7 @@ button {
 .avatar-wrap-sm {
   width: 56px;
   height: 56px;
+  flex: 0 0 auto;
 }
 
 .avatar-wrap-sm img,
@@ -921,12 +971,9 @@ button {
   .table-player-badge,
   .topbar-actions {
     position: static;
-    right: auto;
-    top: auto;
     width: 100%;
     justify-content: center;
     flex-wrap: wrap;
-    transform: none;
   }
 
   .table-player-badge {
@@ -939,6 +986,10 @@ button {
   }
 
   .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-topbar {
     grid-template-columns: 1fr;
   }
 }
