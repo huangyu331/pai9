@@ -1,6 +1,6 @@
 const CACHE_NAME = "paijiu-master-cache-v2";
-const CORE_ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.json", "./hq.mp3"];
-const NETWORK_FIRST_PATHS = new Set(["/", "/index.html", "/styles.css", "/app.js", "/manifest.json", "/hq.mp3"]);
+const CORE_ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.json", "./qynn.mp3"];
+const NETWORK_FIRST_PATHS = new Set(["/", "/index.html", "/styles.css", "/app.js", "/manifest.json", "/qynn.mp3"]);
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

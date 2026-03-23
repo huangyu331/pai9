@@ -44,8 +44,8 @@ const PIP_POSITIONS = {
 };
 
 const TILE_DEFS = [
-  { code: "tian-1", name: "天牌", points: 12, pairKey: "tian", singleRank: 31, top: { count: 6, colors: ["red", "red", "red", "black", "black", "black"] }, bottom: { count: 6, colors: ["red", "red", "red", "black", "black", "black"] } },
-  { code: "tian-2", name: "天牌", points: 12, pairKey: "tian", singleRank: 31, top: { count: 6, colors: ["red", "red", "red", "black", "black", "black"] }, bottom: { count: 6, colors: ["red", "red", "red", "black", "black", "black"] } },
+  { code: "tian-1", name: "天牌", points: 12, pairKey: "tian", singleRank: 31, top: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] }, bottom: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] } },
+  { code: "tian-2", name: "天牌", points: 12, pairKey: "tian", singleRank: 31, top: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] }, bottom: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] } },
   { code: "di-1", name: "地牌", points: 2, pairKey: "di", singleRank: 30, top: { count: 1, colors: ["red"] }, bottom: { count: 1, colors: ["red"] } },
   { code: "di-2", name: "地牌", points: 2, pairKey: "di", singleRank: 30, top: { count: 1, colors: ["red"] }, bottom: { count: 1, colors: ["red"] } },
   { code: "ren-1", name: "人牌", points: 8, pairKey: "ren", singleRank: 29, top: { count: 4, colors: ["red", "red", "red", "red"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
@@ -72,7 +72,7 @@ const TILE_DEFS = [
   { code: "xieba", name: "斜八", points: 8, pairKey: "xieba", singleRank: 17, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
   { code: "hongqi", name: "红七", points: 7, pairKey: "hongqi", singleRank: 16, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
   { code: "heiqi", name: "黑七", points: 7, pairKey: "heiqi", singleRank: 15, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
-  { code: "hongwu", name: "红五", points: 5, pairKey: "hongwu", singleRank: 14, top: { count: 1, colors: ["red"] }, bottom: { count: 4, colors: ["black", "black", "black", "black"] } },
+  { code: "hongwu", name: "红五", points: 5, pairKey: "hongwu", singleRank: 14, top: { count: 1, colors: ["red"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
   { code: "heiwu", name: "黑五", points: 5, pairKey: "heiwu", singleRank: 13, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 3, colors: ["black", "black", "black"] } },
   { code: "dahou", name: "大猴", points: 6, pairKey: "dahou", singleRank: 12, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
   { code: "xiaohou", name: "小猴", points: 3, pairKey: "xiaohou", singleRank: 11, top: { count: 1, colors: ["red"] }, bottom: { count: 2, colors: ["black", "black"] } },
@@ -147,6 +147,7 @@ const state = {
   },
   audio: {
     blocked: false,
+    context: null,
   },
 };
 
@@ -160,6 +161,7 @@ function boot() {
   ensureProfiles();
   normalizeDatabase();
   resetMusicPreferenceForEntry();
+  initAudioFeedback();
   initBackgroundAudio();
   bindEvents();
   renderRules();
@@ -491,32 +493,41 @@ function renderDice(values, rolling) {
     die.setAttribute("aria-hidden", "true");
     die.style.animationDelay = `${index * 90}ms`;
 
-    const cube = document.createElement("div");
-    cube.className = "die-cube";
-    DIE_FACE_ORDER.forEach((faceValue, faceIndex) => {
-      const face = document.createElement("div");
-      face.className = `die-face face-${faceIndex + 1}`;
-      const positions = PIP_POSITIONS[faceValue];
-      positions.forEach((point) => {
-        const pip = document.createElement("span");
-        pip.className = "die-pip";
-        pip.style.left = `${point.x}%`;
-        pip.style.top = `${point.y}%`;
-        face.appendChild(pip);
+    if (rolling) {
+      const cube = document.createElement("div");
+      cube.className = "die-cube";
+      DIE_FACE_ORDER.forEach((faceValue, faceIndex) => {
+        const face = buildDieFace(faceValue);
+        face.classList.add(`face-${faceIndex + 1}`);
+        cube.appendChild(face);
       });
-      cube.appendChild(face);
-    });
-
-    if (!value) {
+      die.appendChild(cube);
+    } else if (!value) {
       const idleMark = document.createElement("div");
       idleMark.className = "die-idle-mark";
       idleMark.textContent = "?";
       die.appendChild(idleMark);
+      die.appendChild(buildDieFace(1, true));
+    } else {
+      die.appendChild(buildDieFace(value, true));
     }
 
-    die.appendChild(cube);
     els.diceValues.appendChild(die);
   });
+}
+
+function buildDieFace(value, flat = false) {
+  const face = document.createElement("div");
+  face.className = flat ? "die-flat-face" : "die-face";
+  const positions = PIP_POSITIONS[value];
+  positions.forEach((point) => {
+    const pip = document.createElement("span");
+    pip.className = "die-pip";
+    pip.style.left = `${point.x}%`;
+    pip.style.top = `${point.y}%`;
+    face.appendChild(pip);
+  });
+  return face;
 }
 
 function buildHalf(half, position) {
@@ -773,15 +784,18 @@ async function startRound() {
     banner: "正在砌牌",
   };
   refreshAll();
+  playFeedbackPattern("build");
   await pause(450);
 
   state.ui.stage = "rolling";
   state.ui.round.banner = "摇骰中";
   refreshTable();
+  playFeedbackPattern("roll");
   await animateDiceRoll(650);
   state.ui.round.rollingDice = null;
   state.ui.round.banner = "骰子落定，决定起牌位置";
   refreshTable();
+  playFeedbackPattern("dice-stop");
   await pause(4000);
 
   state.ui.stage = "dealing";
@@ -796,6 +810,7 @@ async function startRound() {
   }));
   state.ui.round.banner = "牌已落桌，准备开牌";
   refreshTable();
+  playFeedbackPattern("deal");
   await pause(250);
 
   state.ui.stage = "revealing";
@@ -810,25 +825,30 @@ async function startRound() {
   refreshTable();
   state.ui.round.revealedBanker[0] = true;
   refreshTable();
+  playFeedbackPattern("flip");
   await pause(420);
   state.ui.round.banner = "庄家再开一张";
   state.ui.round.activeReveal = { side: "banker", index: 1 };
   state.ui.round.revealedBanker[1] = true;
   refreshTable();
+  playFeedbackPattern("flip");
   await pause(420);
   state.ui.round.banner = "闲家先开第一张";
   state.ui.round.activeReveal = { side: "player", index: 0 };
   state.ui.round.revealedPlayer[0] = true;
   refreshTable();
+  playFeedbackPattern("flip");
   await pause(420);
   state.ui.round.banner = "你翻开最后一张";
   state.ui.round.activeReveal = { side: "player", index: 1 };
   state.ui.round.revealedPlayer[1] = true;
   refreshTable();
+  playFeedbackPattern("flip");
   await pause(520);
   state.ui.round.activeReveal = null;
   state.ui.round.banner = outcome.banner;
   refreshTable();
+  playFeedbackPattern(outcome.result === "win" ? "win" : outcome.result === "lose" ? "lose" : "push");
   await pause(220);
 
   settleRound(outcome);
@@ -868,12 +888,37 @@ function settleRound(outcome) {
   });
   profile.history = profile.history.slice(0, 30);
   persist();
+  playSettlementVisual(outcome.result);
 
   if (profile.chips <= 0) {
     toast("筹码已归零，可在存档面板使用破产保护。", "error");
   } else {
     toast(`${outcome.banner}，本局结算 ${formatSigned(delta)}。`, delta >= 0 ? "success" : "error");
   }
+}
+
+function playSettlementVisual(result) {
+  const variants = {
+    win: "is-win",
+    lose: "is-lose",
+    push: "is-push",
+  };
+  const variant = variants[result];
+  if (!variant) {
+    return;
+  }
+
+  flashClass(els.chipsValue, variant);
+  flashClass(els.betValue, variant);
+}
+
+function flashClass(element, className) {
+  element.classList.remove("is-win", "is-lose", "is-push");
+  void element.offsetWidth;
+  element.classList.add(className);
+  window.setTimeout(() => {
+    element.classList.remove(className);
+  }, 720);
 }
 
 function evaluateHand(tiles, settings) {
@@ -1013,6 +1058,7 @@ function initBackgroundAudio() {
   audio.load();
 
   const unlockPlayback = () => {
+    resumeAudioFeedback();
     if (state.db.preferences.musicEnabled) {
       attemptBackgroundPlayback(true);
     }
@@ -1086,6 +1132,99 @@ function stopBackgroundPlayback() {
   els.bgmAudio.pause();
   state.audio.blocked = false;
   refreshMusicControls();
+}
+
+function initAudioFeedback() {
+  const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextCtor) {
+    return;
+  }
+
+  state.audio.context = new AudioContextCtor();
+  if (state.audio.context.state === "suspended") {
+    state.audio.context.suspend().catch(() => {});
+  }
+}
+
+function resumeAudioFeedback() {
+  const context = state.audio.context;
+  if (!context || context.state === "running") {
+    return;
+  }
+  context.resume().catch(() => {});
+}
+
+function playFeedbackPattern(kind) {
+  if (!state.db.preferences.musicEnabled) {
+    return;
+  }
+
+  const patterns = {
+    build: [{ time: 0, frequency: 196, duration: 0.06, type: "triangle", gain: 0.018 }],
+    roll: [
+      { time: 0, frequency: 180, duration: 0.05, type: "triangle", gain: 0.016 },
+      { time: 0.08, frequency: 220, duration: 0.05, type: "triangle", gain: 0.014 },
+    ],
+    "dice-stop": [{ time: 0, frequency: 330, duration: 0.08, type: "sine", gain: 0.02 }],
+    deal: [{ time: 0, frequency: 246, duration: 0.07, type: "triangle", gain: 0.02 }],
+    flip: [{ time: 0, frequency: 392, duration: 0.045, type: "square", gain: 0.012 }],
+    win: [
+      { time: 0, frequency: 392, duration: 0.08, type: "triangle", gain: 0.02 },
+      { time: 0.1, frequency: 523.25, duration: 0.12, type: "triangle", gain: 0.024 },
+    ],
+    lose: [
+      { time: 0, frequency: 220, duration: 0.08, type: "sawtooth", gain: 0.015 },
+      { time: 0.1, frequency: 164.81, duration: 0.12, type: "sawtooth", gain: 0.014 },
+    ],
+    push: [{ time: 0, frequency: 293.66, duration: 0.1, type: "sine", gain: 0.016 }],
+  };
+
+  const pattern = patterns[kind];
+  if (!pattern) {
+    return;
+  }
+
+  const context = state.audio.context;
+  if (context && context.state === "running") {
+    const baseTime = context.currentTime;
+    pattern.forEach((note) => {
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      oscillator.type = note.type;
+      oscillator.frequency.setValueAtTime(note.frequency, baseTime + note.time);
+      gainNode.gain.setValueAtTime(0.0001, baseTime + note.time);
+      gainNode.gain.exponentialRampToValueAtTime(note.gain, baseTime + note.time + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, baseTime + note.time + note.duration);
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+      oscillator.start(baseTime + note.time);
+      oscillator.stop(baseTime + note.time + note.duration + 0.02);
+    });
+  }
+
+  triggerHaptics(kind);
+}
+
+function triggerHaptics(kind) {
+  if (!("vibrate" in navigator)) {
+    return;
+  }
+
+  const patterns = {
+    build: 12,
+    roll: [14, 28, 14],
+    "dice-stop": 18,
+    deal: 16,
+    flip: 10,
+    win: [18, 40, 24],
+    lose: [28, 60, 18],
+    push: [12, 24, 12],
+  };
+
+  const pattern = patterns[kind];
+  if (pattern) {
+    navigator.vibrate(pattern);
+  }
 }
 
 function registerServiceWorker() {
