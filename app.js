@@ -43,9 +43,91 @@ const PIP_POSITIONS = {
   ],
 };
 
+const FACE_LAYOUTS = {
+  changsan: [
+    { x: 50, y: 16, color: "black" },
+    { x: 50, y: 30, color: "black" },
+    { x: 32, y: 50, color: "black" },
+    { x: 68, y: 50, color: "black" },
+    { x: 50, y: 70, color: "black" },
+    { x: 50, y: 84, color: "black" },
+  ],
+  bandeng: [
+    { x: 32, y: 18, color: "black" },
+    { x: 68, y: 18, color: "black" },
+    { x: 32, y: 82, color: "black" },
+    { x: 68, y: 82, color: "black" },
+  ],
+  pingba: [
+    { x: 32, y: 18, color: "black" },
+    { x: 68, y: 18, color: "black" },
+    { x: 32, y: 54, color: "black" },
+    { x: 68, y: 54, color: "black" },
+    { x: 32, y: 66, color: "black" },
+    { x: 68, y: 66, color: "black" },
+    { x: 32, y: 78, color: "black" },
+    { x: 68, y: 78, color: "black" },
+  ],
+  xieba: [
+    { x: 24, y: 16, color: "black" },
+    { x: 50, y: 30, color: "black" },
+    { x: 76, y: 44, color: "black" },
+    { x: 32, y: 58, color: "black" },
+    { x: 68, y: 58, color: "black" },
+    { x: 50, y: 72, color: "black" },
+    { x: 32, y: 86, color: "black" },
+    { x: 68, y: 86, color: "black" },
+  ],
+  hongqi: [
+    { x: 20, y: 18, color: "black" },
+    { x: 36, y: 32, color: "black" },
+    { x: 52, y: 46, color: "black" },
+    { x: 20, y: 74, color: "red" },
+    { x: 56, y: 74, color: "red" },
+    { x: 20, y: 90, color: "red" },
+    { x: 56, y: 90, color: "red" },
+  ],
+  heiqi: [
+    { x: 32, y: 16, color: "black" },
+    { x: 68, y: 16, color: "black" },
+    { x: 32, y: 60, color: "black" },
+    { x: 68, y: 60, color: "black" },
+    { x: 50, y: 74, color: "black" },
+    { x: 32, y: 88, color: "black" },
+    { x: 68, y: 88, color: "black" },
+  ],
+  hongwu: [
+    { x: 50, y: 18, color: "red" },
+    { x: 32, y: 50, color: "red" },
+    { x: 68, y: 50, color: "red" },
+    { x: 32, y: 82, color: "red" },
+    { x: 68, y: 82, color: "red" },
+  ],
+  heiwu: [
+    { x: 24, y: 16, color: "black" },
+    { x: 40, y: 32, color: "black" },
+    { x: 56, y: 48, color: "black" },
+    { x: 32, y: 82, color: "black" },
+    { x: 68, y: 82, color: "black" },
+  ],
+  dahou: [
+    { x: 32, y: 18, color: "black" },
+    { x: 68, y: 18, color: "black" },
+    { x: 32, y: 56, color: "red" },
+    { x: 68, y: 56, color: "red" },
+    { x: 32, y: 82, color: "red" },
+    { x: 68, y: 82, color: "red" },
+  ],
+  xiaohou: [
+    { x: 50, y: 18, color: "red" },
+    { x: 32, y: 82, color: "black" },
+    { x: 68, y: 82, color: "black" },
+  ],
+};
+
 const TILE_DEFS = [
-  { code: "tian-1", name: "天牌", points: 12, pairKey: "tian", singleRank: 31, top: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] }, bottom: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] } },
-  { code: "tian-2", name: "天牌", points: 12, pairKey: "tian", singleRank: 31, top: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] }, bottom: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] } },
+  { code: "tian-1", name: "天牌", points: 12, pairKey: "tian", singleRank: 31, top: { count: 6, colors: ["black", "red", "black", "red", "black", "red"] }, bottom: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] } },
+  { code: "tian-2", name: "天牌", points: 12, pairKey: "tian", singleRank: 31, top: { count: 6, colors: ["black", "red", "black", "red", "black", "red"] }, bottom: { count: 6, colors: ["red", "black", "red", "black", "red", "black"] } },
   { code: "di-1", name: "地牌", points: 2, pairKey: "di", singleRank: 30, top: { count: 1, colors: ["red"] }, bottom: { count: 1, colors: ["red"] } },
   { code: "di-2", name: "地牌", points: 2, pairKey: "di", singleRank: 30, top: { count: 1, colors: ["red"] }, bottom: { count: 1, colors: ["red"] } },
   { code: "ren-1", name: "人牌", points: 8, pairKey: "ren", singleRank: 29, top: { count: 4, colors: ["red", "red", "red", "red"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
@@ -54,10 +136,10 @@ const TILE_DEFS = [
   { code: "he-2", name: "和牌", points: 4, pairKey: "he", singleRank: 28, top: { count: 1, colors: ["red"] }, bottom: { count: 3, colors: ["black", "black", "black"] } },
   { code: "mei-1", name: "梅花", points: 10, pairKey: "mei", singleRank: 27, top: { count: 5, colors: ["black", "black", "black", "black", "black"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
   { code: "mei-2", name: "梅花", points: 10, pairKey: "mei", singleRank: 27, top: { count: 5, colors: ["black", "black", "black", "black", "black"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
-  { code: "changsan-1", name: "长三", points: 6, pairKey: "changsan", singleRank: 26, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 3, colors: ["black", "black", "black"] } },
-  { code: "changsan-2", name: "长三", points: 6, pairKey: "changsan", singleRank: 26, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 3, colors: ["black", "black", "black"] } },
-  { code: "bandeng-1", name: "板凳", points: 4, pairKey: "bandeng", singleRank: 25, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 2, colors: ["black", "black"] } },
-  { code: "bandeng-2", name: "板凳", points: 4, pairKey: "bandeng", singleRank: 25, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 2, colors: ["black", "black"] } },
+  { code: "changsan-1", name: "长三", points: 6, pairKey: "changsan", singleRank: 26, facePips: FACE_LAYOUTS.changsan, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 3, colors: ["black", "black", "black"] } },
+  { code: "changsan-2", name: "长三", points: 6, pairKey: "changsan", singleRank: 26, facePips: FACE_LAYOUTS.changsan, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 3, colors: ["black", "black", "black"] } },
+  { code: "bandeng-1", name: "板凳", points: 4, pairKey: "bandeng", singleRank: 25, facePips: FACE_LAYOUTS.bandeng, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 2, colors: ["black", "black"] } },
+  { code: "bandeng-2", name: "板凳", points: 4, pairKey: "bandeng", singleRank: 25, facePips: FACE_LAYOUTS.bandeng, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 2, colors: ["black", "black"] } },
   { code: "futou-1", name: "斧头", points: 11, pairKey: "futou", singleRank: 24, top: { count: 5, colors: ["black", "black", "black", "black", "black"] }, bottom: { count: 6, colors: ["black", "black", "black", "black", "black", "black"] } },
   { code: "futou-2", name: "斧头", points: 11, pairKey: "futou", singleRank: 24, top: { count: 5, colors: ["black", "black", "black", "black", "black"] }, bottom: { count: 6, colors: ["black", "black", "black", "black", "black", "black"] } },
   { code: "hongtou-1", name: "红头十", points: 10, pairKey: "hongtou", singleRank: 23, top: { count: 4, colors: ["red", "red", "red", "red"] }, bottom: { count: 6, colors: ["black", "black", "black", "black", "black", "black"] } },
@@ -68,14 +150,14 @@ const TILE_DEFS = [
   { code: "linglinliu-2", name: "零霖六", points: 6, pairKey: "linglinliu", singleRank: 21, top: { count: 1, colors: ["red"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
   { code: "hongjiu", name: "红九", points: 9, pairKey: "hongjiu", singleRank: 20, top: { count: 4, colors: ["red", "red", "red", "red"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
   { code: "heijiu", name: "黑九", points: 9, pairKey: "heijiu", singleRank: 19, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 6, colors: ["black", "black", "black", "black", "black", "black"] } },
-  { code: "pingba", name: "平八", points: 8, pairKey: "pingba", singleRank: 18, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 6, colors: ["black", "black", "black", "black", "black", "black"] } },
-  { code: "xieba", name: "斜八", points: 8, pairKey: "xieba", singleRank: 17, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
-  { code: "hongqi", name: "红七", points: 7, pairKey: "hongqi", singleRank: 16, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
-  { code: "heiqi", name: "黑七", points: 7, pairKey: "heiqi", singleRank: 15, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
-  { code: "hongwu", name: "红五", points: 5, pairKey: "hongwu", singleRank: 14, top: { count: 1, colors: ["red"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
-  { code: "heiwu", name: "黑五", points: 5, pairKey: "heiwu", singleRank: 13, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 3, colors: ["black", "black", "black"] } },
-  { code: "dahou", name: "大猴", points: 6, pairKey: "dahou", singleRank: 12, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
-  { code: "xiaohou", name: "小猴", points: 3, pairKey: "xiaohou", singleRank: 11, top: { count: 1, colors: ["red"] }, bottom: { count: 2, colors: ["black", "black"] } },
+  { code: "pingba", name: "平八", points: 8, pairKey: "pingba", singleRank: 18, facePips: FACE_LAYOUTS.pingba, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 6, colors: ["black", "black", "black", "black", "black", "black"] } },
+  { code: "xieba", name: "斜八", points: 8, pairKey: "xieba", singleRank: 17, facePips: FACE_LAYOUTS.xieba, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
+  { code: "hongqi", name: "红七", points: 7, pairKey: "hongqi", singleRank: 16, facePips: FACE_LAYOUTS.hongqi, top: { count: 3, colors: ["black", "black", "black"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
+  { code: "heiqi", name: "黑七", points: 7, pairKey: "heiqi", facePips: FACE_LAYOUTS.heiqi, singleRank: 15, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 5, colors: ["black", "black", "black", "black", "black"] } },
+  { code: "hongwu", name: "红五", points: 5, pairKey: "hongwu", singleRank: 14, facePips: FACE_LAYOUTS.hongwu, top: { count: 1, colors: ["red"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
+  { code: "heiwu", name: "黑五", points: 5, pairKey: "heiwu", singleRank: 13, facePips: FACE_LAYOUTS.heiwu, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 3, colors: ["black", "black", "black"] } },
+  { code: "dahou", name: "大猴", points: 6, pairKey: "dahou", singleRank: 12, facePips: FACE_LAYOUTS.dahou, top: { count: 2, colors: ["black", "black"] }, bottom: { count: 4, colors: ["red", "red", "red", "red"] } },
+  { code: "xiaohou", name: "小猴", points: 3, pairKey: "xiaohou", singleRank: 11, facePips: FACE_LAYOUTS.xiaohou, top: { count: 1, colors: ["red"] }, bottom: { count: 2, colors: ["black", "black"] } },
 ];
 
 const PAIR_RANKS = new Map([
@@ -471,12 +553,12 @@ function buildTile(tile) {
   label.textContent = tile.name;
   front.appendChild(label);
 
-  const divider = document.createElement("div");
-  divider.className = "tile-divider";
-  front.appendChild(divider);
-
-  front.appendChild(buildHalf(tile.top, "top"));
-  front.appendChild(buildHalf(tile.bottom, "bottom"));
+  if (tile.facePips) {
+    front.appendChild(buildFullFace(tile.facePips));
+  } else {
+    front.appendChild(buildHalf(tile.top, "top"));
+    front.appendChild(buildHalf(tile.bottom, "bottom"));
+  }
   body.appendChild(front);
   body.appendChild(back);
   node.appendChild(body);
@@ -537,6 +619,19 @@ function buildHalf(half, position) {
   positions.forEach((point, index) => {
     const pip = document.createElement("span");
     pip.className = `pip ${half.colors[index]}`;
+    pip.style.left = `${point.x}%`;
+    pip.style.top = `${point.y}%`;
+    node.appendChild(pip);
+  });
+  return node;
+}
+
+function buildFullFace(pips) {
+  const node = document.createElement("div");
+  node.className = "tile-full-face";
+  pips.forEach((point) => {
+    const pip = document.createElement("span");
+    pip.className = `pip ${point.color}`;
     pip.style.left = `${point.x}%`;
     pip.style.top = `${point.y}%`;
     node.appendChild(pip);
