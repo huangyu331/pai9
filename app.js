@@ -1323,7 +1323,6 @@ function triggerHaptics(kind) {
 }
 
 function registerServiceWorker() {
-  const serviceWorkerUrl = "./sw.js?v=20260325-1";
   if ("serviceWorker" in navigator) {
     const hadController = Boolean(navigator.serviceWorker.controller);
     let refreshing = false;
@@ -1337,7 +1336,7 @@ function registerServiceWorker() {
     });
 
     navigator.serviceWorker
-      .register(serviceWorkerUrl, { updateViaCache: "none" })
+      .register("./sw.js", { updateViaCache: "none" })
       .then((registration) => {
         registration.update().catch(() => {});
 
