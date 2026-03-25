@@ -1048,7 +1048,7 @@ function evaluateHand(tiles, settings) {
     title: points === 0 ? "瘪十" : `${points}点`,
     description: `${left.name} + ${right.name}`,
     points,
-    strength: [1, points, 0, left.singleRank, right.singleRank],
+    strength: [0, points, 0, left.singleRank, right.singleRank],
   };
 }
 

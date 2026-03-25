@@ -1,4 +1,4 @@
-const APP_VERSION = "20260325-1";
+const APP_VERSION = "20260325-2";
 const CACHE_NAME = `paijiu-master-cache-${APP_VERSION}`;
 const CORE_ASSETS = [
   "./",
