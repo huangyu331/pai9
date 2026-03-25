@@ -1,4 +1,5 @@
 const STORAGE_KEY = "paijiu-master-save-v1";
+const APP_VERSION = "20260325-2";
 const DEFAULT_PREFERENCES = {
   theme: "dark",
   musicEnabled: true,
@@ -258,6 +259,7 @@ function mapElements() {
   return {
     playerName: document.getElementById("playerName"),
     playerMeta: document.getElementById("playerMeta"),
+    frontendVersion: document.getElementById("frontendVersion"),
     chipsValue: document.getElementById("chipsValue"),
     betValue: document.getElementById("betValue"),
     diceValues: document.getElementById("diceValues"),
@@ -452,6 +454,7 @@ function refreshHeader() {
   els.playerName.textContent = profile.nickname;
   els.tablePlayerName.textContent = profile.nickname;
   els.playerMeta.textContent = `总局数 ${formatNumber(profile.stats.rounds)} · 总盈利 ${formatSigned(profile.stats.profit)}`;
+  els.frontendVersion.textContent = `前端版本 v${APP_VERSION}`;
   els.chipsValue.textContent = formatNumber(profile.chips);
   els.playerAvatar.hidden = !profile.avatar;
   els.tablePlayerAvatar.parentElement.hidden = !profile.avatar;
