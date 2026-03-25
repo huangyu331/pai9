@@ -210,7 +210,7 @@ const RULES_SECTIONS = [
   {
     title: "存档与奖励",
     lines: [
-      "首次创建存档赠送 10,000 筹码。",
+      "首次创建存档赠送 20,000 筹码。",
       "每日首次登录额外领取 1,000 筹码。",
       "筹码为 0 时可每日免费重置 1 次。",
     ],
@@ -378,7 +378,7 @@ function createProfile(name, avatar = "") {
     id: crypto.randomUUID(),
     nickname: name || "新玩家",
     avatar,
-    chips: 10000,
+    chips: 20000,
     createdAt: now,
     lastDailyReward: "",
     lastBankruptReset: "",
@@ -745,7 +745,7 @@ function createProfileFromInput() {
   els.avatarInput.value = "";
   delete els.avatarInput.dataset.avatarData;
   persist();
-  toast("新存档已创建，已赠送 10,000 筹码。", "success");
+  toast("新存档已创建，已赠送 20,000 筹码。", "success");
   refreshAll();
 }
 
@@ -838,9 +838,9 @@ function bankruptReset(profileId = state.db.activeProfileId) {
     return;
   }
   profile.lastBankruptReset = today;
-  profile.chips = 10000;
+  profile.chips = 20000;
   persist();
-  toast("破产保护已生效，筹码重置为 10,000。", "success");
+  toast("破产保护已生效，筹码重置为 20,000。", "success");
   refreshAll();
 }
 
@@ -1323,6 +1323,7 @@ function triggerHaptics(kind) {
 }
 
 function registerServiceWorker() {
+  const serviceWorkerUrl = "./sw.js?v=20260325-1";
   if ("serviceWorker" in navigator) {
     const hadController = Boolean(navigator.serviceWorker.controller);
     let refreshing = false;
@@ -1336,7 +1337,7 @@ function registerServiceWorker() {
     });
 
     navigator.serviceWorker
-      .register("./sw.js", { updateViaCache: "none" })
+      .register(serviceWorkerUrl, { updateViaCache: "none" })
       .then((registration) => {
         registration.update().catch(() => {});
 

@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#4f0f14" />
     <title>牌九大师</title>
-    <link rel="manifest" href="./manifest.json" />
-    <link rel="stylesheet" href="./styles.css" />
+    <!-- 发版时同步更新版本号，强制客户端拉取最新静态资源 -->
+    <link rel="manifest" href="./manifest.json?v=20260325-1" />
+    <link rel="stylesheet" href="./styles.css?v=20260325-1" />
   </head>
   <body>
     <div class="app-shell compact-shell">
@@ -24,7 +25,7 @@
             </div>
             <div class="table-bankroll bankroll-summary">
               <p class="panel-label">当前筹码</p>
-              <div class="chips-value" id="chipsValue">10,000</div>
+              <div class="chips-value" id="chipsValue">20,000</div>
             </div>
             <div class="topbar-actions">
               <button class="ghost-button music-button" id="bgmToggleButton" type="button" aria-pressed="true">音乐开</button>
@@ -201,6 +202,6 @@
     <div class="toast-stack" id="toastStack"></div>
     <audio id="bgmAudio" src="./qynn.mp3" loop preload="auto" autoplay playsinline webkit-playsinline></audio>
 
-    <script src="./app.js"></script>
+    <script src="./app.js?v=20260325-1"></script>
   </body>
 </html>
